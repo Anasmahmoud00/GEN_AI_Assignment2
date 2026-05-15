@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+venv/
+env/
+.conda/
+
+# Jupyter Notebook (Excluded as requested)
+Dates_Generator_Colab.ipynb
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db

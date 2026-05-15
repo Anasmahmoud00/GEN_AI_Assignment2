@@ -1,0 +1,11 @@
+name: dsai490_a2
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - matplotlib
+  - pip:
+    - tensorflow==2.15.0
