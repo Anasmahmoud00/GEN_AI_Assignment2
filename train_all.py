@@ -8,32 +8,37 @@ import subprocess
 import sys
 import os
 
-# Get the directory where this script is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-models = ["mlp", "gan", "vae", "flow"]
+models = ["mlp", "gan", "vae", "diffusion"]
+
 
 def train():
-    for model in models:
-        print(f"\n" + "="*50)
-        print(f" Starting Training for: {model.upper()} ")
-        print("="*50 + "\n")
+    for model_name in models:
+        print("\n" + "=" * 50)
+        print(" Starting Training for: " + model_name.upper())
+        print("=" * 50 + "\n")
         
-        # Build path relative to the script location
-        script_path = os.path.join(BASE_DIR, "model", model, "train.py")
+        script_path = os.path.join(BASE_DIR, "model", model_name, "train.py")
         
-        if not os.path.exists(script_path):
-            print(f"[ERROR] Could not find script at: {script_path}")
-            print(f"Current Working Directory: {os.getcwd()}")
+        path_exists = os.path.exists(script_path)
+        if not path_exists:
+            print("[ERROR] Could not find script at: " + script_path)
+            cwd_path = os.getcwd()
+            print("Current Working Directory: " + cwd_path)
             continue
 
-        # Run the training script
-        # Setting the CWD to BASE_DIR ensures internal imports work
-        result = subprocess.run([sys.executable, script_path], cwd=BASE_DIR)
+        python_executable = sys.executable
+        process_args = [python_executable, script_path]
         
-        if result.returncode == 0:
-            print(f"\n[SUCCESS] {model.upper()} training completed.")
+        result = subprocess.run(process_args, cwd=BASE_DIR)
+        
+        exit_code = result.returncode
+        if exit_code == 0:
+            print("\n[SUCCESS] " + model_name.upper() + " training completed.")
         else:
-            print(f"\n[FAILED] {model.upper()} training failed.")
+            print("\n[FAILED] " + model_name.upper() + " training failed.")
+
 
 if __name__ == "__main__":
     train()
+

@@ -21,47 +21,39 @@ We sample z ~ N(0,1) and decode with the condition.
 
 import tensorflow as tf
 
-COND_DIM   = 22   # condition vector size
-DATE_DIM   = 3    # date vector size (day, month, year normalised)
-LATENT_DIM = 16   # size of the latent space z
+COND_DIM   = 22
+DATE_DIM   = 3
+LATENT_DIM = 16
 
 
 def build_encoder():
-    """
-    Encoder E(c, x) → (mean, log_var)
-
-    Takes condition + real date, outputs latent distribution parameters.
-    """
-    model = tf.keras.Sequential([
-        tf.keras.layers.Dense(64, activation="relu",
-                              input_shape=(COND_DIM + DATE_DIM,)),
+    encoder_layers = [
+        tf.keras.layers.Dense(64, activation="relu", input_shape=(COND_DIM + DATE_DIM,)),
         tf.keras.layers.Dense(32, activation="relu"),
-        tf.keras.layers.Dense(LATENT_DIM * 2),   # first half = mean, second = log_var
-    ], name="Encoder")
+        tf.keras.layers.Dense(LATENT_DIM * 2)
+    ]
+    model = tf.keras.Sequential(encoder_layers, name="Encoder")
     return model
 
 
 def build_decoder():
-    """
-    Decoder D(z, c) → reconstructed date
-
-    Takes latent z + condition, outputs a date vector in (0,1).
-    This is also used standalone at inference time.
-    """
-    model = tf.keras.Sequential([
-        tf.keras.layers.Dense(64, activation="relu",
-                              input_shape=(LATENT_DIM + COND_DIM,)),
+    decoder_layers = [
+        tf.keras.layers.Dense(64, activation="relu", input_shape=(LATENT_DIM + COND_DIM,)),
         tf.keras.layers.Dense(32, activation="relu"),
-        tf.keras.layers.Dense(DATE_DIM, activation="sigmoid"),  # output in (0,1)
-    ], name="Decoder")
+        tf.keras.layers.Dense(DATE_DIM, activation="sigmoid")
+    ]
+    model = tf.keras.Sequential(decoder_layers, name="Decoder")
     return model
 
 
 def reparameterise(mean, log_var):
-    """
-    Reparameterisation trick:  z = mean + eps * std
-    Allows gradients to flow through the sampling step.
-    """
-    eps = tf.random.normal(shape=tf.shape(mean))
-    std = tf.exp(0.5 * log_var)
-    return mean + eps * std
+    shape_of_mean = tf.shape(mean)
+    eps = tf.random.normal(shape=shape_of_mean)
+    
+    std_dev = 0.5 * log_var
+    std = tf.exp(std_dev)
+    
+    random_z = eps * std
+    z = mean + random_z
+    return z
+

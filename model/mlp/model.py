@@ -13,11 +13,6 @@ Architecture
   Input  : condition vector (22)
   Layers : Dense(128, relu) → Dense(64, relu) → Dense(32, relu) → Dense(3)
   Output : date vector (3 floats in [0,1])
-
-Why outside the course?
-  The course focuses on generative models (GAN, VAE, Diffusion).
-  MLP as a conditional regressor / conditional generator is not
-  part of the generative models curriculum — it's a baseline approach.
 """
 
 import tensorflow as tf
@@ -27,14 +22,13 @@ DATE_DIM = 3
 
 
 def build_mlp():
-    """
-    Simple MLP: conditions (22) → date (3).
-    """
-    model = tf.keras.Sequential([
-        tf.keras.layers.Dense(128, activation="relu",
-                              input_shape=(COND_DIM,)),
-        tf.keras.layers.Dense(64,  activation="relu"),
-        tf.keras.layers.Dense(32,  activation="relu"),
-        tf.keras.layers.Dense(DATE_DIM, activation="sigmoid"),  # output in (0,1)
-    ], name="MLP")
+    layers = [
+        tf.keras.layers.Dense(128, activation="relu", input_shape=(COND_DIM,)),
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dense(32, activation="relu"),
+        tf.keras.layers.Dense(DATE_DIM, activation="sigmoid")
+    ]
+    
+    model = tf.keras.Sequential(layers, name="MLP")
     return model
+
